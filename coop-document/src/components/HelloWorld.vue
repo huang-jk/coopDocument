@@ -13,15 +13,39 @@
 <script>
 
 import QuillDocument from '../utils/quil-gulf';
-import Quill from 'quill';
+import Quill from 'quill/quill.js';
 import io from 'socket.io-client';
 import ss from 'socket.io-stream';
-var stream = ss.createStream();
 
 export default {
   name: 'HelloWorld',
   mounted() {
+    this.oneTest();
+      
+      
+  },
+  methods: {
+    twoTest() {
+      this.quill = new Quill('#quillHello', {
+        modules: { toolbar: '#toolbar' },
+        theme: 'snow'
+      });
+      console.log(this.quill);
+      this.quillDocument = new QuillDocument({
+          editorInstance: this.quill
+      });
+      var ws = new WebSocket("ws://localhost:3000");
+      console.log(ws);
+      // Connect to alice's server
+      ws.connect(function(socket) {
+        // create a link to the master
+        var master = doc.masterLink()
 
+        // connect to master document
+        socket.pipe(master).pipe(socket)
+      })
+    },
+    oneTest() {
       this.quill = new Quill('#quillHello', {
         modules: { toolbar: '#toolbar' },
         theme: 'snow'
@@ -31,26 +55,26 @@ export default {
           editorInstance: this.quill
       });
       console.log(this.quillDocument);
-      // var master = this.quillDocument.masterLink()
+      var master = this.quillDocument.masterLink()
 
-      // console.log(master);
-      // console.log(stream.pipe(socket));
+      this.quill.setContents('abs');
+      console.log(master);
       
-      const socket = io('http://localhost:3000');
-      socket.on('connect', function(client){
-        // stream.pipe(master).pipe(client)
-        // console.log(client);
-        socket.on('news', function (data) {
-          console.log(data);
-        });
-        console.log('链接成功');
-      });
-      
-  },
+      // const socket = io.connect('http://localhost:3000');
+      // var stream = ss.createStream();
+      // ss(socket).emit('file', stream);
+      // console.log(stream);
+      // stream.pipe(master).pipe(stream); 
+      //   // ss(client).on('file', function(stream, data) {
+      //   //   stream.pipe(master).pipe(stream);
+      //   // });
+      //   console.log('链接成功');
+    }
+  }
 }
 </script>
 <style lang="scss">
-  @import '../utils/quil.scss';
+  // @import '../utils/quil.scss';
 </style>
 
 

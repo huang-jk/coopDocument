@@ -12,22 +12,31 @@ const path = require('path');        // 这是node的路径处理模块，可以
 const textOT = require('ot-text').type
 const gulf = require('gulf')
 
+var ss = require('socket.io-stream');
 
-// var doc = new gulf.Document({
-//   storageAdapter: new gulf.MemoryAdapter,
-//   ottype: textOT
-// })
-// doc.initializeFromStorage('abc') // Optionally supply default content
+var doc = new gulf.Document({
+  storageAdapter: new gulf.MemoryAdapter,
+  ottype: textOT
+})
+
+doc.initializeFromStorage('abc') // Optionally supply default content
 
 server.listen(3000,()=>{                
   console.log("server running at 127.0.0.1:3000");       // 代表监听3000端口，然后执行回调函数在控制台输出。  
 });
+
 /*socket*/  
+var slave = doc.slaveLink()
+
+
 io.on('connection',(socket)=>{              //监听客户端的连接事件  
     socket.emit('news', { hello: 'world' });
     socket.on('disconnect', function(){
       console.log('user disconnected');
     });
-    // var slave = doc.slaveLink()
-    // socket.pipe(slave).pipe(socket)
+
+    ss(socket).on('file', function(stream) {
+      console.log('11111111')
+      stream.pipe(slave).pipe(stream);
+    });
 });
